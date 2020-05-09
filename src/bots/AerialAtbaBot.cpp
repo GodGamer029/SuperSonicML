@@ -15,8 +15,8 @@ void AerialAtbaBot::process(const BotInputData& data, ControllerInput& output) {
 			   car.vel * timeToArrival +
 			   0.5 * gravity * timeToArrival * timeToArrival;
 
-	targetPos += ball.vel * timeToArrival;
-	targetPos[2] = clip(targetPos[2], 95, 5000);
+	targetPos += ball.vel * timeToArrival + 0.5 * gravity * timeToArrival * timeToArrival;
+	targetPos[2] = clip(targetPos[2], 95, 2000);
 
 	vec3c deltaX = targetPos - xf;
 	vec3c direction = normalize(deltaX);
@@ -24,7 +24,7 @@ void AerialAtbaBot::process(const BotInputData& data, ControllerInput& output) {
 	// Aerial pd
 	if (!car.hasWheelContact) {
 		auto carOrientation = car.orientation;
-		auto carForward = vec3c{carOrientation(0, 0), carOrientation(1, 0), carOrientation(2, 0)};
+		auto carForward = car.forward();
 
 		auto localAng = dot(car.ang, carOrientation);
 		auto localTarget = dot(direction, carOrientation);

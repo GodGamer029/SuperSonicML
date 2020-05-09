@@ -76,10 +76,10 @@ namespace SuperSonicML::Hooks {
 
 			auto botInputData = BotInputData{ ballData, carData, gravity, myCar.GetPhysicsTime() };
 
-			static auto currentBot = AerialAtbaBot();
+			static auto currentBot = AtbaBot();
 			currentBot.process(botInputData, vehicleInput->NewInput);
 
-			ball.SetCarBounceScale(3);
+			ball.SetCarBounceScale(2);
 		}
 	}
 }

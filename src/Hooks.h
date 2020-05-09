@@ -2,6 +2,7 @@
 
 #include <bakkesmod/wrappers/GameObject/CarWrapper.h>
 #include "bots/AerialAtbaBot.h"
+#include "bots/AtbaBot.h"
 
 struct ACar_TA_eventSetVehicleInput_Params {
 	struct ControllerInput NewInput;
