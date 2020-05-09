@@ -4,7 +4,6 @@
 
 class AtbaBot : BotClass {
 public:
-private:
-	void process(const BotInputData& data) override;
+	void process(const BotInputData& data, ControllerInput& output) override;
 	std::string getName() override;
 };

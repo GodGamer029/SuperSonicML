@@ -17,5 +17,5 @@ namespace SuperSonicML::Plugin {
 		virtual void onUnload() override;
 	};
 
-	SuperSonicMLPlugin* pluginInstance = 0;
+	SuperSonicMLPlugin* pluginInstance = nullptr;
 }

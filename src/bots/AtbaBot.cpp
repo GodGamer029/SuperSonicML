@@ -1,6 +1,6 @@
 #include "AtbaBot.h"
 
-void AtbaBot::process(const BotInputData& data) {
+void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 
 }
 

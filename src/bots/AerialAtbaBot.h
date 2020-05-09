@@ -1,10 +1,10 @@
 #pragma once
 
 #include "BotClass.h"
+#include <bakkesmod/wrappers/GameObject/CarComponent/JumpComponentWrapper.h>
 
 class AerialAtbaBot : BotClass {
 public:
-private:
-	void process(const BotInputData& data) override;
+	void process(const BotInputData& data, ControllerInput& output) override;
 	std::string getName() override;
 };

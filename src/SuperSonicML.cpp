@@ -2,7 +2,7 @@
 
 namespace SuperSonicML::Plugin {
 
-	BAKKESMOD_PLUGIN(SuperSonicMLPlugin, SuperSonicML::Constants::pluginName, SuperSonicML::Constants::versionString, 0);
+	BAKKESMOD_PLUGIN(SuperSonicMLPlugin, SuperSonicML::Constants::pluginName, SuperSonicML::Constants::versionString, 0)
 
 	void SuperSonicMLPlugin::onLoad() {
 		pluginInstance = this;
@@ -10,8 +10,7 @@ namespace SuperSonicML::Plugin {
 		SuperSonicML::Share::cvarManager = this->cvarManager;
 		SuperSonicML::Share::gameWrapper = this->gameWrapper;
 
-		SuperSonicML::Share::cvar_enabled = std::make_shared<bool>();
-		this->cvarManager->registerCvar("supersonicml_enabled", "0", "Enable/Disable the plugin", true, true, 0.f, true, 1.f).bindTo(SuperSonicML::Share::cvar_enabled);
+		this->cvarManager->registerCvar("supersonicml_enabled", "0", "Enable/Disable the plugin", true, true, 0.f, true, 1.f).bindTo(SuperSonicML::Share::cvarEnabled);
 		if(this->gameWrapper->IsInFreeplay()) // Hot reloading
 			this->cvarManager->executeCommand("supersonicml_enabled 1", true);
 
