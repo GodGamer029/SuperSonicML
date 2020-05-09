@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 17)
 
 if(NOT CMAKE_BUILD_TYPE MATCHES Release)
-    message(FATAL_ERROR "Bakkesmod plugins have to be built in release mode to work correctly, use --config Release")
+    message(FATAL_ERROR "Bakkesmod plugins have to be built in release mode to work correctly, use -DCMAKE_BUILD_TYPE=Release, current mode: \"${CMAKE_BUILD_TYPE}\" config: ${CONFIG}")
 endif()
 
 find_package(Torch)

@@ -47,7 +47,6 @@ bakkes_patchplugin.py
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
 *.exe
