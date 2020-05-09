@@ -79,20 +79,24 @@ namespace SuperSonicML::Hooks {
 			static auto currentBot = AtbaBot();
 			currentBot.process(botInputData, vehicleInput->NewInput);
 
-			ball.SetCarBounceScale(2); //
+			static std::once_flag onceFlag;
 
-			ball.SetBallScale(2); // Make it easier to hit
-			ball.SetWorldBounceScale(2);
-			ball.SetBallGravityScale(1);
+			std::call_once(onceFlag, [&](){
+			  ball.SetCarBounceScale(2); //
+
+			  ball.SetBallScale(2); // Make it easier to hit
+			  ball.SetWorldBounceScale(2);
+			  ball.SetBallGravityScale(1);
+
+			  // more predictable
+			  ball.SetMaxLinearSpeed(2000);
+			  ball.SetMaxAngularSpeed(1);
+			});
 
 			auto alteredVel = ballData.vel;
 			if(alteredVel[2] > 0)
 				alteredVel[2] *= 0.95f; // Dampen z vel
 			ball.SetVelocity(Vector(alteredVel[0], alteredVel[1], alteredVel[2]));
-
-			// more predictable
-			ball.SetMaxLinearSpeed(2000);
-			ball.SetMaxAngularSpeed(1);
 		}
 	}
 }
