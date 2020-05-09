@@ -25,6 +25,9 @@ Find the bakkesmod plugin settings folder (Usually located in `steamapps\common\
 If you have an IDE, you can use [this python script](https://pastebin.com/cs6i2gQD) to automatically reload the plugin as the post-build step without having to restart rocket league.
 Replace the `bakkesmod_plugin_folder` variable in that script with the path to your bakkesmod plugins folder, and supply the path to the SuperSonicML.dll as the first argument.
 
+
+**For the script to work correctly, you need to enable the built-in RconPlugin in bakkesmod's plugin manager!**
+
 Example:
 ```commandline
 python C:\Users\<username>\source\repos\SuperSonicML\bakkes_patchplugin.py build\bin\SuperSonicML.dll
