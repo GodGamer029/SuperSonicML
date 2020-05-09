@@ -6,6 +6,8 @@ Download [CMake v3.16.6](https://cmake.org/download/) or higher (Released 10th o
 
 Download the latest [LibTorch](https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.5.0.zip) version (Tested with 1.5.0, cpu version)
 
+Download and install [bakkesmod](https://bakkesmod.com) by opening bakkesmod and starting the game once.
+
 For MSVC:
 ```commandline
 git clone https://github.com/GodGamer029/SuperSonicML.git
@@ -16,7 +18,7 @@ cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFI
 cmake --build . --config Release
 ```
 
-If you use CLion, you need to add the command line parameter `-DCMAKE_PREFIX_PATH` to your cmake profile in Settings -> Build, Execution, Deployment -> CMake. You also need to change Build Type to release.
+If you use CLion, you need to add the command line parameter `-DCMAKE_PREFIX_PATH` to your cmake profile in Settings -> Build, Execution, Deployment -> CMake. You also need to change Build Type to Release.
 
 Find the bakkesmod plugin settings folder (Usually located in `steamapps\common\rocketleague\Binaries\Win64\bakkesmod\plugins\settings`) and drop [this file](https://raw.githubusercontent.com/GodGamer029/SuperSonicML/master/resources/supersonicml.set) in there.
 
