@@ -64,3 +64,13 @@ Either manually copy the dll and enable it in plugin manager, or run the python 
 Go into freeplay and check the "Enable control take-over"-box in the SuperSonicML plugin settings in the menu (`F2` to open the menu).
 
 If you don't see the checkbox, **close all menus** and reload plugin settings with the command `cl_settings_refreshplugins` (`F6` to open the console)
+
+## Speeding up RocketLeague
+
+Alter game-speed using the bakkesmod console command `sv_soccar_gamespeed <number>`
+
+Physics ticks are limited to 5 physics ticks per frame, so uncapping your fps will massively increase the number of physics ticks possible. 
+
+Uncap your fps by opening the settings file (`Documents\My Games\Rocket League\TAGame\Config\TASystemSettings.ini`) and change `AllowPerFrameSleep` from true to false.
+
+Use the "Disable Rendering" feature in the bakkesmod Misc tab to improve your fps even further.  
