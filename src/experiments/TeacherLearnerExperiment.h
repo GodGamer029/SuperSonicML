@@ -13,22 +13,23 @@
 
 // https://pytorch.org/cppdocs/frontend.html
 struct Net : torch::nn::Module {
-	torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr};
+	torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 
 	Net() {
-		fc1 = register_module("fc1", torch::nn::Linear(10, 30));
-		fc2 = register_module("fc2", torch::nn::Linear(30, 15));
-		fc3 = register_module("fc3", torch::nn::Linear(15, 3));
+		fc1 = register_module("fc1", torch::nn::Linear(10, 40));
+		fc2 = register_module("fc2", torch::nn::Linear(40, 30));
+		fc3 = register_module("fc3", torch::nn::Linear(30, 3));
+		//fc4 = register_module("fc4", torch::nn::Linear(20, 3));
 	}
 
 	// Implement the Net's algorithm.
 	torch::Tensor forward(torch::Tensor x) {
 		// Use one of many tensor manipulation functions.
-		x = torch::relu(fc1->forward(x));
-		x = torch::dropout(x, /*p=*/0.2, /*train=*/is_training());
-		x = torch::relu(fc2->forward(x));
-		x = torch::dropout(x, /*p=*/0.2, /*train=*/is_training());
-		x = fc3->forward(x).clamp(-1, 1); // no activation
+		x = torch::leaky_relu(fc1->forward(x));
+		x = torch::dropout(x, /*p=*/0.5, /*train=*/is_training());
+		x = torch::leaky_relu(fc2->forward(x));
+		x = torch::dropout(x, /*p=*/0.3, /*train=*/is_training());
+		x = torch::nn::functional::softsign(fc3->forward(x)).clamp(-1, 1);
 		return x;
 	}
 
@@ -52,6 +53,10 @@ private:
 
 	std::deque<std::tuple<float/*loss*/, std::vector<float>/*input*/, std::vector<float>/*expected output*/>> replayMemory;
 	double totalLossInReplayMemory = 0;
+
+	void processGroundBased(const BotInputData&, ControllerInput& output);
+	void processAirBased(const BotInputData&, ControllerInput& output);
+
 public:
 	TeacherLearnerExperiment(std::shared_ptr<AtbaBot> bot);
 
