@@ -29,6 +29,9 @@ void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 
 	output.Throttle = clip(norm(vec2c(car.pos) - vec2c(futureBallPos)) / 100, 0.05, 1);
 
+	if(fabs(angle) > 1 && dot(car.vel, car.forward()) > 800)
+		output.Throttle = -1;
+
 	if(targetLocal[0] > 2000 && fabs(angle) < 0.1f)
 		output.ActivateBoost = 1;
 	else if(fabs(angle) > 0.9 && fabs(dot(car.ang, car.orientation)[2]) < 3 && dot(car.vel, car.forward()) > 300)

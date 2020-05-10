@@ -11,8 +11,6 @@
 
 namespace SuperSonicML::Hooks {
 
-	AerialAtbaBot atbaBot;
-
 	void UpdateData(CarWrapper myCar, void* pVoidParams, const std::string& eventName) {
 		if (!*SuperSonicML::Share::cvarEnabled)
 			return;
@@ -76,8 +74,8 @@ namespace SuperSonicML::Hooks {
 
 			auto botInputData = BotInputData{ ballData, carData, gravity, myCar.GetPhysicsTime() };
 
-			static auto currentBot = AtbaBot();
-			currentBot.process(botInputData, vehicleInput->NewInput);
+			static auto currentExperiment = TeacherLearnerExperiment(std::make_shared<AtbaBot>());
+			currentExperiment.process(botInputData, vehicleInput->NewInput);
 
 			static std::once_flag onceFlag;
 

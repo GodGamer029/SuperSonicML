@@ -84,6 +84,13 @@ inline float sgn(float x) {
 	return float((0.0f < x) - (x < 0.0f));
 }
 
+inline vec3c clip(vec3c x, float minimum, float maximum) {
+	vec3c ret;
+	for(int i = 0; i < 3; i++)
+		ret[i] = fmax(fmin(x[i], maximum), minimum);
+	return ret;
+}
+
 inline float clip(float x, float minimum, float maximum) {
 	return fmax(fmin(x, maximum), minimum);
 }

@@ -30,6 +30,7 @@ add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX WIN32 SuperSonicML_EXPORTS 
 
 include_directories(.)
 include_directories(include)
+include_directories(src)
 
 file(GLOB_RECURSE includes RELATIVE include/
         "*.h"
@@ -50,7 +51,7 @@ add_library(SuperSonicML SHARED
         src/Hooks.cpp
         src/Hooks.h
         src/SuperSonicML.cpp
-        src/SuperSonicML.h src/bots/BotClass.cpp src/bots/BotClass.h src/bots/AtbaBot.cpp src/bots/AtbaBot.h src/bots/AerialAtbaBot.cpp src/bots/AerialAtbaBot.h)
+        src/SuperSonicML.h src/bots/BotClass.cpp src/bots/BotClass.h src/bots/AtbaBot.cpp src/bots/AtbaBot.h src/bots/AerialAtbaBot.cpp src/bots/AerialAtbaBot.h src/experiments/Experiment.cpp src/experiments/Experiment.h src/experiments/TeacherLearnerExperiment.cpp src/experiments/TeacherLearnerExperiment.h)
 
 target_precompile_headers(SuperSonicML
         PRIVATE
