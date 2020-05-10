@@ -32,7 +32,7 @@ void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 	if(fabs(angle) > 1 && dot(car.vel, car.forward()) > 800)
 		output.Throttle = -1;
 
-	if(targetLocal[0] > 1000 && fabs(angle) < 0.1f && dot(car.vel, car.forward()) < 2000)
+	if(targetLocal[0] > 1000 && fabs(angle) < 0.1f && dot(car.vel, car.forward()) < 1800)
 		output.ActivateBoost = 1;
 	else if(fabs(angle) > 0.9 && fabs(dot(car.ang, car.orientation)[2]) < 3 && dot(car.vel, car.forward()) > 300)
 		output.Handbrake = 1;

@@ -66,7 +66,8 @@ void TeacherLearnerExperiment /*<T, EnableIfBot<T>>*/ ::process(const BotInputDa
 
 	static float avgLoss = 1; // Running average
 	avgLoss = (avgLoss * 120 * 0.5f + lossF) / (120 * 0.5f + 1);
-	SuperSonicML::Share::cvarManager->log(std::string("Avg loss: ")+std::to_string(avgLoss)+" rep:"+std::to_string(this->totalLossInReplayMemory / fmax(1, this->replayMemory.size()))+" steer: "+std::to_string(networkOutput[1].item().toFloat()));
+	if(car.carWrapper.GetPhysicsFrame() % 30 == 0)
+		SuperSonicML::Share::cvarManager->log(std::string("Avg loss: ")+std::to_string(avgLoss)+" rep:"+std::to_string(this->totalLossInReplayMemory / fmax(1, this->replayMemory.size()))+" steer: "+std::to_string(networkOutput[1].item().toFloat()));
 
 	constexpr auto REPLAYMEMORY_MIN = 120 * 0.1f;
 	constexpr auto REPLAYMEMORY_MAX = 120 * 30;
@@ -96,7 +97,7 @@ void TeacherLearnerExperiment /*<T, EnableIfBot<T>>*/ ::process(const BotInputDa
 		static std::random_device rd;
 		static std::mt19937 e2(rd());
 		constexpr float oscillationPreventer = 0.05f; // prevents oscilliation, because this function prefers samples with high loss at the time they were added, we will hit a lot of samples that would already have a decreased loss in the current network, but are still being trained on which causes a lot of overfitting on these samples
-		for(int batchI = 0; batchI < 4; batchI++){
+		for(int batchI = 0; batchI < 2; batchI++){
 			std::uniform_real_distribution<> distribution(0, this->totalLossInReplayMemory * 0.99f + oscillationPreventer * this->replayMemory.size());
 			double chosenOne = distribution(e2);
 			int ind = -1;
