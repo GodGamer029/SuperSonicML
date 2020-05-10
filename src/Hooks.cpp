@@ -87,7 +87,7 @@ namespace SuperSonicML::Hooks {
 			  ball.SetBallGravityScale(1);
 
 			  // more predictable
-			  ball.SetMaxLinearSpeed(2000);
+			  ball.SetMaxLinearSpeed(4000);
 			  ball.SetMaxAngularSpeed(1);
 			});
 

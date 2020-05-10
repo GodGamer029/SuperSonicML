@@ -6,7 +6,7 @@ void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 	auto gravity = data.gravity;
 
 	auto T = fmin(0.5, norm(vec2c(car.pos) - vec2c(ball.pos)) / (50 + norm(car.vel)));
-	auto futureBallPos = ball.pos + ball.vel * T + 0.5 * gravity * T * T;
+	auto futureBallPos = ball.pos/* + ball.vel * T + 0.5 * gravity * T * T*/;
 	futureBallPos[2] = clip(futureBallPos[2], 95, 2000);
 
 	if(fabs(futureBallPos[1]) > 5120){ // Target inside goal
@@ -32,7 +32,7 @@ void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 	if(fabs(angle) > 1 && dot(car.vel, car.forward()) > 800)
 		output.Throttle = -1;
 
-	if(targetLocal[0] > 2000 && fabs(angle) < 0.1f)
+	if(targetLocal[0] > 1000 && fabs(angle) < 0.1f && dot(car.vel, car.forward()) < 2000)
 		output.ActivateBoost = 1;
 	else if(fabs(angle) > 0.9 && fabs(dot(car.ang, car.orientation)[2]) < 3 && dot(car.vel, car.forward()) > 300)
 		output.Handbrake = 1;
