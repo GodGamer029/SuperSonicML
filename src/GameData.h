@@ -13,4 +13,6 @@ namespace SuperSonicML::Share {
 	extern std::shared_ptr<GameWrapper> gameWrapper;
 
 	extern std::shared_ptr<bool> cvarEnabled;
+	extern std::shared_ptr<bool> cvarEnableSlide;
+	extern std::shared_ptr<int> cvarBatchSize;
 }

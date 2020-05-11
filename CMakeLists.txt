@@ -23,9 +23,9 @@ if(NOT MSVC)
     message(WARNING "This build script was only tested with MSVC")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS} /O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS} /O2 /Ob2") # Optimizations
 
-add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>) #
 
 add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX WIN32 SuperSonicML_EXPORTS _WINDOWS _USRDLL)
 

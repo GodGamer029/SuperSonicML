@@ -28,8 +28,7 @@ namespace SuperSonicML::Hooks {
 
 		if (elapsedMilli.count() >= 1000) {
 			char buf[200];
-			torch::Tensor tensor = torch::eye(3);
-			sprintf_s(buf, "Took: %d %d %s", ticks, (int) elapsedMilli.count(), tensor.toString().c_str());
+			sprintf_s(buf, "Phys-ticks: %d in %d ms", ticks, (int) elapsedMilli.count());
 			SuperSonicML::Share::cvarManager->log(buf);
 			lastMsg = now;
 			ticks = 0;
@@ -83,18 +82,51 @@ namespace SuperSonicML::Hooks {
 			  ball.SetCarBounceScale(2); //
 
 			  ball.SetBallScale(2); // Make it easier to hit
-			  ball.SetWorldBounceScale(2);
+			  ball.SetWorldBounceScale(1);
 			  ball.SetBallGravityScale(1);
 
 			  // more predictable
 			  ball.SetMaxLinearSpeed(4000);
-			  ball.SetMaxAngularSpeed(1);
+			  ball.SetMaxAngularSpeed(3);
 			});
 
-			auto alteredVel = ballData.vel;
+			// Unstuck the car if its stuck
+			static std::deque<vec3c> carPosQueue;
+
+			if(myCar.GetPhysicsFrame() % 30 == 0){
+				carPosQueue.push_back(carData.pos);
+
+				if(carPosQueue.size() > 4 * 5){
+					carPosQueue.pop_front();
+
+					// Determine if the car is stuck
+					constexpr auto okDist = 200;
+					bool isStuck = true;
+
+					for(auto it1 = carPosQueue.begin(); it1 != carPosQueue.end() && isStuck; it1++){
+						for(auto it2 = carPosQueue.begin(); it2 != carPosQueue.end(); it2++){
+							if(it1 == it2)
+								continue;
+
+							float dist = norm(*it1 - *it2);
+							if(dist > okDist){
+								isStuck = false;
+								break;
+							}
+						}
+					}
+
+					if(isStuck){
+						carPosQueue.clear();
+						myCar.SetLocation(Vector(rand() % 1000 - 500, rand() % 1000 - 500, 50));
+					}
+				}
+			}
+
+			/*auto alteredVel = ballData.vel;
 			if(alteredVel[2] > 0)
 				alteredVel[2] *= 0.95f; // Dampen z vel
-			ball.SetVelocity(Vector(alteredVel[0], alteredVel[1], alteredVel[2]));
+			ball.SetVelocity(Vector(alteredVel[0], alteredVel[1], alteredVel[2]));*/
 		}
 	}
 }
