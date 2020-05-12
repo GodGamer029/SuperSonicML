@@ -92,9 +92,11 @@ namespace SuperSonicML::Hooks {
 
 			// Unstuck the car if its stuck
 			static std::deque<vec3c> carPosQueue;
+			static std::deque<vec3c> ballPosQueue;
 
 			if(myCar.GetPhysicsFrame() % 30 == 0){
 				carPosQueue.push_back(carData.pos);
+				ballPosQueue.push_back(ballData.pos);
 
 				if(carPosQueue.size() > 4 * 5){
 					carPosQueue.pop_front();
@@ -119,6 +121,32 @@ namespace SuperSonicML::Hooks {
 					if(isStuck){
 						carPosQueue.clear();
 						myCar.SetLocation(Vector(rand() % 1000 - 500, rand() % 1000 - 500, 50));
+					}
+				}
+
+				if(ballPosQueue.size() > 4 * 20){
+					ballPosQueue.pop_front();
+
+					// Determine if the ball is stuck
+					constexpr auto okDist = 200;
+					bool isStuck = true;
+
+					for(auto it1 = ballPosQueue.begin(); it1 != ballPosQueue.end() && isStuck; it1++){
+						for(auto it2 = ballPosQueue.begin(); it2 != ballPosQueue.end(); it2++){
+							if(it1 == it2)
+								continue;
+
+							float dist = norm(*it1 - *it2);
+							if(dist > okDist){
+								isStuck = false;
+								break;
+							}
+						}
+					}
+
+					if(isStuck){
+						ballPosQueue.clear();
+						ball.SetLocation(Vector(rand() % 3000 - 1500, rand() % 3000 - 1500, 200));
 					}
 				}
 			}
