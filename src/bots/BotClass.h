@@ -29,6 +29,7 @@ public:
 	} const car;
 	const vec3c gravity;
 	const float elapsedSeconds;
+	const ControllerInput originalInput;
 };
 
 class BotClass {

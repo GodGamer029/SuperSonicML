@@ -23,6 +23,10 @@ if(NOT MSVC)
     message(WARNING "This build script was only tested with MSVC")
 endif()
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wno-nonportable-include-path)
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS} /O2 /Ob2") # Optimizations
 
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>) #

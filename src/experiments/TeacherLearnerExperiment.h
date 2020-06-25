@@ -17,20 +17,20 @@ struct Net : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 
 	Net() {
-		fc1 = register_module("fc1", torch::nn::Linear(6 * 3 + 1, 35));
-		fc2 = register_module("fc2", torch::nn::Linear(35, 30));
-		fc3 = register_module("fc3", torch::nn::Linear(30, 4));
-		//fc4 = register_module("fc4", torch::nn::Linear(20, 3));
+		fc1 = register_module("fc1", torch::nn::Linear(8 * 3 + 1, 40));
+		fc2 = register_module("fc2", torch::nn::Linear(40, 30));
+		fc3 = register_module("fc3", torch::nn::Linear(30, 30));
+		fc4 = register_module("fc4", torch::nn::Linear(30, 4));
 	}
 
-	// Implement the Net's algorithm.
 	torch::Tensor forward(torch::Tensor x) {
-		// Use one of many tensor manipulation functions.
 		x = torch::leaky_relu(fc1->forward(x));
 		x = torch::dropout(x, /*p=*/0.3, /*train=*/is_training());
 		x = torch::leaky_relu(fc2->forward(x));
 		x = torch::dropout(x, /*p=*/0.3, /*train=*/is_training());
-		x = torch::nn::functional::softsign(fc3->forward(x)).clamp(-1, 1);
+		x = torch::leaky_relu(fc3->forward(x));
+		x = torch::dropout(x, /*p=*/0.3, /*train=*/is_training());
+		x = torch::tanh(fc4->forward(x));
 		return x;
 	}
 };
@@ -50,15 +50,15 @@ class TeacherLearnerExperiment; // Idk why this is here, but it doesn't compile 
 
 class TeacherLearnerExperiment/*<T, EnableIfBot<T>>*/ : Experiment {
 private:
-	static constexpr auto REPLAYMEMORY_MIN = 120 * 3;
-	static constexpr auto REPLAYMEMORY_MAX = 120 * 60 * 2;
-	static constexpr auto INPUT_SIZE = 6 * 3 + 1;
+	static constexpr auto REPLAYMEMORY_MIN = 120 * 3; // 3 seconds
+	static constexpr auto REPLAYMEMORY_MAX = 120 * 60 * 3; // 3 minutes of memory
+	static constexpr auto INPUT_SIZE = 8 * 3 + 1;
 	static constexpr auto OUTPUT_SIZE = 4;
 
 	std::shared_ptr<AtbaBot> teacherBot;
 	std::shared_ptr<Net> network;
 
-	std::deque<std::tuple<float/*loss*/, std::array<float, INPUT_SIZE>/*input*/, std::array<float, OUTPUT_SIZE>/*expected output*/>> replayMemory;
+	std::deque<std::tuple<float/*loss*/, std::array<float, INPUT_SIZE>/*input*/, std::array<float, OUTPUT_SIZE>/*expected output*/, float/*multiplier*/>> replayMemory;
 	double totalLossInReplayMemory = 0;
 
 	void processGroundBased(const BotInputData&, ControllerInput& output);

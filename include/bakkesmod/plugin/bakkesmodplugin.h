@@ -79,7 +79,8 @@ static std::shared_ptr<classType> singleton;\
 				_plugin = plugin;
 				_instance = instance;
 				_filename = filename;
-				_typeid = std::make_shared<std::type_index>(typeid(*plugin));
+				auto obj = *plugin;
+				_typeid = std::make_shared<std::type_index>(typeid(obj));
 			}
 			~LoadedPlugin() {
 				//_details.get()->delFunc();

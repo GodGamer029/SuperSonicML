@@ -6,5 +6,7 @@ namespace SuperSonicML::Share {
 
 	std::shared_ptr<bool> cvarEnabled = std::make_shared<bool>();
 	std::shared_ptr<bool> cvarEnableSlide = std::make_shared<bool>();
+	std::shared_ptr<bool> cvarEnableTraining = std::make_shared<bool>();
+	std::shared_ptr<bool> cvarEnableUserAsTeacher = std::make_shared<bool>();
 	std::shared_ptr<int> cvarBatchSize = std::make_shared<int>(2);
 }

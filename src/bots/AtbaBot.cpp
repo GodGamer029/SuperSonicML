@@ -21,6 +21,8 @@ void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 
 	if(futureBallPos[2] > 100 && norm(vec2c(car.pos) - vec2c(futureBallPos)) > 500){ // Target in air
 		futureBallPos[2] = 0;
+	}else{
+		futureBallPos[2] = fmax(17, futureBallPos[2] - 70);
 	}
 
 	auto targetLocal = dot(futureBallPos - car.pos, car.orientation);
@@ -36,6 +38,10 @@ void AtbaBot::process(const BotInputData& data, ControllerInput& output) {
 		output.ActivateBoost = 1;
 	else if(fabs(angle) > 0.9 && fabs(dot(car.ang, car.orientation)[2]) < 3 && dot(car.vel, car.forward()) > 300)
 		output.Handbrake = 1;
+
+	if(!car.hasWheelContact) {
+
+	}
 }
 
 std::string AtbaBot::getName() {
