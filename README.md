@@ -1,5 +1,9 @@
 # SuperSonicML
-[Bakkesmod plugin](https://bakkesmod.com) that supplies inputs to rocket league at a very high speed.
+[Bakkesmod plugin](https://bakkesmod.com) that supplies inputs to rocket league at a very high speed, enabling reinforcement learning.
+
+Speedups as much as 170x have been achieved, for more information feel free to ask in the RLBot discord.
+
+It is also possible to run multiple instances of rocket league in parallel using steamless.
 
 ## Setup (For developers)
 Download [CMake v3.16.6](https://cmake.org/download/) or higher (Released 10th of April, 2020)
@@ -54,7 +58,7 @@ You may need to inject more dlls depending on your version of libtorch (I used l
  
 If you get an error saying that you can't inject 64-bit dlls into a 32-bit process, you have chosen the RocketLeague launcher (32-bit) instead of the actual RocketLeague game (64-bit). Note that both processes have the exact same name (rocketleague.exe)
 
-These dlls have to be injected everytime you start rocketleague and intend to use this plugin, it won't load if those dlls are not loaded.
+These dlls have to be injected everytime you start rocketleague and intend to use this plugin, it won't load if those dlls are not present.
 
 *Todo: remove this step*
 
@@ -64,16 +68,25 @@ Either manually copy the dll and enable it in plugin manager, or run the python 
 
 ## Using the plugin
 
-Go into freeplay and check the "Enable control take-over"-box in the SuperSonicML plugin settings in the menu (`F2` to open the menu).
+~~Go into freeplay and check the "Enable control take-over"-box in the SuperSonicML plugin settings in the menu (`F2` to open the menu).~~
 
-If you don't see the checkbox, **close all menus** and reload plugin settings with the command `cl_settings_refreshplugins` (`F6` to open the console)
+~~If you don't see the checkbox, **close all menus** and reload plugin settings with the command `cl_settings_refreshplugins` (`F6` to open the console)~~
+
+The bakkesmod console (`F6`) has been proven to be much more useful, type `supersonicml` and use tab to autocomplete, and change different properties.
+
+This is also a great way to check if the plugin loaded correctly.
 
 ## Speeding up RocketLeague
 
-Alter game-speed using the bakkesmod console command `sv_soccar_gamespeed <number>`
+- Alter game-speed using the bakkesmod console command `sv_soccar_gamespeed <number>`
 
-Physics ticks are limited to 5 physics ticks per frame, so uncapping your fps will massively increase the number of physics ticks possible. 
+- Physics ticks are limited to 5 physics ticks per frame, so uncapping your fps will massively increase the number of physics ticks possible.
 
-Uncap your fps by opening the settings file (`Documents\My Games\Rocket League\TAGame\Config\TASystemSettings.ini`) and change `AllowPerFrameSleep` from true to false.
+    This can be changed with the following code:
+    `SuperSonicML::Share::gameWrapper->GetEngine().SetMaxPhysicsSubsteps(50);`
 
-Use the "Disable Rendering" feature in the bakkesmod Misc tab to improve your fps even further.  
+    Rocket league limits this value to approx. 50, so we created [a cheat engine script to remove the limitation](https://pastebin.com/YuXWdV05). It still remains unknown why this limitation exists though, so proceed with caution.
+
+- Uncap your fps by opening the settings file (`Documents\My Games\Rocket League\TAGame\Config\TASystemSettings.ini`) and change `AllowPerFrameSleep` from true to false.
+
+- Use the "Disable Rendering" box in the bakkesmod Misc tab to improve your fps even further.  
