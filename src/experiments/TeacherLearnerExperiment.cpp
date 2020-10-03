@@ -4,7 +4,7 @@
 #include <sstream>
 
 //template<typename T>
-TeacherLearnerExperiment /*<T, EnableIfBot<T>>*/ ::TeacherLearnerExperiment(std::shared_ptr<AtbaBot> bot) {
+TeacherLearnerExperiment /*<T, EnableIfBot<T>>*/ ::TeacherLearnerExperiment(std::shared_ptr<AerialAtbaBot> bot) {
 	this->teacherBot = bot;
 	this->network = std::make_shared<Net>();
 
@@ -22,11 +22,6 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 	auto car = input.car;
 
 	{
-		if(!car.hasWheelContact){
-			output.Throttle = 1;
-			return;
-		}
-
 		ControllerInput teacherOutput = {};
 		if(*SuperSonicML::Share::cvarEnableUserAsTeacher){
 			// user is teacher
@@ -35,10 +30,7 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 			this->teacherBot->process(input, teacherOutput);
 		}
 
-		if(!*SuperSonicML::Share::cvarEnableSlide)
-			teacherOutput.Handbrake = 0;
-
-		std::array<float, OUTPUT_SIZE> expectedOutputArray = {(float) teacherOutput.Throttle, (float) teacherOutput.Steer, teacherOutput.ActivateBoost ? 1.f : 0.f, teacherOutput.Handbrake ? 1.f : 0.f/*, teacherOutput.Pitch, teacherOutput.Yaw, teacherOutput.Roll, static_cast<float>(teacherOutput.Jump)*/};
+		std::array<float, OUTPUT_SIZE> expectedOutputArray = {(float) teacherOutput.Throttle, (float) teacherOutput.Steer, teacherOutput.ActivateBoost ? 1.f : 0.f, teacherOutput.Handbrake ? 1.f : 0.f, teacherOutput.Pitch, teacherOutput.Yaw, teacherOutput.Roll, static_cast<float>(teacherOutput.Jump)};
 		auto expectedOutput = torch::tensor(torch::ArrayRef(expectedOutputArray));
 
 		// Make state for learner
@@ -92,8 +84,8 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 		addVecToInputVec(targetLocal);
 
 		netInputArray[counter++] = forwardSpeed;
-		//netInputArray[counter++] = isOnGround;
-		//netInputArray[counter++] = canDodge;
+		netInputArray[counter++] = isOnGround;
+		netInputArray[counter++] = canDodge;
 
 		if(counter != INPUT_SIZE){
 			SuperSonicML::Share::cvarManager->log("INPUT_SIZE != counter "+std::to_string(INPUT_SIZE)+" != "+std::to_string(counter));
@@ -106,14 +98,22 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 		auto loss = torch::nn::functional::mse_loss(networkOutput, expectedOutput);
 		float multiplier = 1;
 
+		//if(!car.hasWheelContact)
+		//	multiplier = 0;
+
 		// Close encounters with the ball are important to learn
 		if(norm(car.pos - ball.pos) < 92 + 60 + 50)
 			multiplier *= 1.2f;
 
-		if(norm(car.vel) < 300) // basically standing still
-			multiplier *= 1.5f;
+		if(norm(car.vel) < 200) // basically standing still
+			multiplier *= 1.4f;
 
-		if(*SuperSonicML::Share::cvarEnableTraining && *SuperSonicML::Share::cvarEnableUserAsTeacher && car.carWrapper.GetPhysicsFrame() % 10 < 5){
+		static bool lastJump = false;
+
+		//if(teacherOutput.Jump == 1ui32 && !lastJump) // rising edge
+		//	multiplier *= 5;
+
+		if(*SuperSonicML::Share::cvarEnableTraining && *SuperSonicML::Share::cvarEnableUserAsTeacher && (car.carWrapper.GetPhysicsFrame() % 12 < 8 || !car.hasWheelContact/*(teacherOutput.Jump == 1ui32 && !lastJump)*/)){
 			output = teacherOutput;
 		}else{
 			output.Throttle = clip(networkOutput[0].item().toFloat(), -1.f, 1.f);
@@ -123,11 +123,18 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 			output.Handbrake = networkOutput[3].item().toFloat() > 0.5f ? 1 : 0;
 
 			multiplier *= 0.4f;
-			/*output.Pitch = clip(networkOutput[4].item().toFloat(), -1.f, 1.f);
+			output.Pitch = clip(networkOutput[4].item().toFloat(), -1.f, 1.f);
 			output.Yaw = clip(networkOutput[5].item().toFloat(), -1.f, 1.f);
 			output.Roll = clip(networkOutput[6].item().toFloat(), -1.f, 1.f);
-			output.Jump = networkOutput[7].item().toFloat() > 0.5f ? 1 : 0;*/
+			if(*SuperSonicML::Share::cvarEnableTraining){
+				output.Jump = teacherOutput.Jump;
+			}else{
+				output.Jump = networkOutput[7].item().toFloat() > 0.5f ? 1 : 0;
+			}
+
 		}
+		lastJump = teacherOutput.Jump == 1ui32;
+
 		loss = loss * multiplier;
 
 		float lossF = loss.item().toFloat();
@@ -139,15 +146,17 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 
 		// add to replay memory
 		if(*SuperSonicML::Share::cvarEnableTraining){
-			this->replayMemory.emplace_back(lossF, netInputArray, expectedOutputArray, multiplier);
-			this->totalLossInReplayMemory += lossF;
+			if(multiplier > 0){
+				this->replayMemory.emplace_back(lossF, netInputArray, expectedOutputArray, multiplier);
+				this->totalLossInReplayMemory += lossF;
+			}
 
 			if(this->replayMemory.size() > REPLAYMEMORY_MAX){
 				auto toRemove = this->replayMemory.front();
 				this->totalLossInReplayMemory -= std::get<0>(toRemove);
 				this->replayMemory.pop_front();
 			}
-		}else if(this->replayMemory.size() > 0){
+		}else if(!this->replayMemory.empty()){
 			this->replayMemory.clear();
 			this->totalLossInReplayMemory = 0;
 		}
@@ -155,7 +164,7 @@ void TeacherLearnerExperiment::processGroundBased(const BotInputData& input, Con
 
 	// Train on replay memory
 	if(this->replayMemory.size() > REPLAYMEMORY_MIN && this->totalLossInReplayMemory > 0.01f && *SuperSonicML::Share::cvarEnableTraining){
-		static torch::optim::Adam optimizer(this->network->parameters(), torch::optim::AdamOptions(0.001f /*learning rate*/));
+		static torch::optim::Adam optimizer(this->network->parameters(), torch::optim::AdamOptions(0.00005f /*learning rate*/));
 
 		static std::random_device rd;
 		static std::mt19937 e2(rd());

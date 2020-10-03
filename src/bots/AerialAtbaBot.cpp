@@ -9,7 +9,7 @@ void AerialAtbaBot::process(const BotInputData& data, ControllerInput& output) {
 	auto targetPos = ball.pos;
 
 	auto dist = norm(car.pos - targetPos);
-	auto timeToArrival = clip(dist / (float) fmax(700, 100 + norm(car.vel)), 0.01f, 4.f);
+	auto timeToArrival = 1.2f * clip(dist / (float) fmax(200, 100 + norm(car.vel)), 0.05f, 4.f);
 
 	vec3c xf = car.pos +
 			   car.vel * timeToArrival +
@@ -23,6 +23,7 @@ void AerialAtbaBot::process(const BotInputData& data, ControllerInput& output) {
 
 	// Aerial pd
 	if (!car.hasWheelContact) {
+		output.Jump = 1;
 		auto carOrientation = car.orientation;
 		auto carForward = car.forward();
 
@@ -52,7 +53,7 @@ void AerialAtbaBot::process(const BotInputData& data, ControllerInput& output) {
 		}
 
 	} else if (car.carWrapper.GetbJumped() == 0 || car.carWrapper.GetJumpComponent().CanActivate()) {
-		if (rand() % 5 == 0 && norm(car.ang) < 0.3f)
+		if (rand() % 5 != 0 && norm(car.ang) < 0.3f)
 			output.Jump = 1;
 	}
 	output.Throttle = 0.05f; // Helps to flip the car back up onto the wheels

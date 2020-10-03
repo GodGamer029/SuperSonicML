@@ -28,7 +28,7 @@ namespace SuperSonicML::Hooks {
 
 		if (elapsedMilli.count() >= 2000) {
 			char buf[200];
-			sprintf_s(buf, "Phys-ticks: %d in %d ms", ticks / 2, (int) elapsedMilli.count() / 2);
+			sprintf_s(buf, "Phys-ticks: %d in %d ms %llX", ticks / 2, (int) elapsedMilli.count() / 2, myCar.GetVehicleSim().memory_address);
 			SuperSonicML::Share::cvarManager->log(buf);
 			lastMsg = now;
 			ticks = 0;
@@ -77,10 +77,14 @@ namespace SuperSonicML::Hooks {
 			auto botInputData = BotInputData{ ballData, carData, gravity, myCar.GetPhysicsTime(), vehicleInput->NewInput };
 
 			memset(&vehicleInput->NewInput, 0, sizeof(ControllerInput));
-			static auto currentExperiment = TeacherLearnerExperiment(std::make_shared<AtbaBot>());
+			static auto currentExperiment = TeacherLearnerExperiment(std::make_shared<AerialAtbaBot>());
 			currentExperiment.process(botInputData, vehicleInput->NewInput);
 
 			static std::once_flag onceFlag;
+
+
+			//SuperSonicML::Share::gameWrapper->GetEngine().SetMaxPhysicsSubsteps(6);
+
 
 			// Make it easier for the agent to hit the ball into positions it wasn't in before, bringing more diversity into the dataset
 			std::call_once(onceFlag, [&](){
